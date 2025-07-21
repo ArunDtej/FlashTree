@@ -1,0 +1,13 @@
+[package]
+name = "word_trie"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dashmap = "5"
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+
+#ndarray = "0.15"
+#ndarray-rand = "0.14"
+#rand = "0.8"
