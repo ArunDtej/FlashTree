@@ -30,6 +30,9 @@ FlashTree is a small server you can run locally or on a server. It stores, retri
 
 ### Build & Run
 
-git clone https://github.com/yourname/flash-tree.git
+git clone (https://github.com/ArunDtej/FlashTree)
+
 cd flash-tree
+
 cargo run --release
+
