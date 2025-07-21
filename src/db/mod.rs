@@ -50,7 +50,6 @@ impl Database {
 
     pub fn set(&self, key: &str, value: Value) -> Result<(), String> {
         Ok(())
-        //  Err("Not Implemented yet".to_string())
     }
 
     pub fn get(&self, key: &str) -> Result<Option<Value>, String> {
@@ -59,5 +58,13 @@ impl Database {
 
     pub fn delete(&self, key: &str) -> Result<bool, String> {
         todo!("Implement DELETE operation")
+    }
+
+    pub fn drop_all(&self){
+        let mut root = self.root.write().unwrap();
+        root.value = None;
+        root.ttl = None;
+        root.children = None;
+        // Ok(true)
     }
 }
