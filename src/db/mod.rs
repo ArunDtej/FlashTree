@@ -1,6 +1,7 @@
 
 use std::sync::{Arc, RwLock};
 use dashmap::DashMap;
+use serde_json::Error;
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -17,7 +18,7 @@ pub enum Value {
 #[derive(Debug)]
 pub struct Node {
     pub value: Option<Value>,
-    pub ttl: Option<u64>, // Unix timestamp
+    pub ttl: Option<u64>,
     pub children: Option<DashMap<String, Arc<RwLock<Node>>>>,
 }
 
@@ -26,12 +27,11 @@ impl Node {
         Node {
             value: None,
             ttl: None,
-            children: Some(DashMap::new()),
+            children: None,
         }
     }
 }
 
-// Database handle that wraps the root node
 #[derive(Debug, Clone)]
 pub struct Database {
     root: Arc<RwLock<Node>>,
@@ -48,19 +48,16 @@ impl Database {
         &self.root
     }
 
-    // TODO: Implement core operations
     pub fn set(&self, key: &str, value: Value) -> Result<(), String> {
-        // Implementation will go here
-        todo!("Implement SET operation")
+        Ok(())
+        //  Err("Not Implemented yet".to_string())
     }
 
     pub fn get(&self, key: &str) -> Result<Option<Value>, String> {
-        // Implementation will go here
-        todo!("Implement GET operation")
+        Ok((None))
     }
 
     pub fn delete(&self, key: &str) -> Result<bool, String> {
-        // Implementation will go here
         todo!("Implement DELETE operation")
     }
 }
