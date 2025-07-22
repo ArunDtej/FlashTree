@@ -46,10 +46,21 @@ fn dispatch_command(cmd: &[u8]) -> Command {
         "get" => Command::Get,
         "del" => Command::Del,
         "drop" => Command::Drop,
+        "incr" => Command::Unknown,
+        "decr" => Command::Unknown,
 
         // many operations
         "mget" => Command::Unknown,
         "mset" => Command::Unknown,
+
+        // regional commands
+        "regiget" => Command::Unknown, // regiget client:users:emails a@gmail.com b@gmail.com .....
+        "regiset" => Command::Unknown, // regiset client:users:emails a@gmail.com val1 b@gmail.com val2 .....
+        "regidel" => Command::Unknown, // regidel client:users:emails a@gmail.com b@gmail.com .....
+        "regigetall" => Command::Unknown,
+        "regigetn" => Command::Unknown,
+        "regiincr" => Command::Unknown,
+        "regidecr" => Command::Unknown,
 
         // list based operations
         "lpush" => Command::Unknown,
