@@ -1,6 +1,6 @@
+use crate::db::{Database, Value};
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::tcp::OwnedWriteHalf;
-use crate::db::{Database, Value};
 
 pub struct CommandParts<'a> {
     parts: Vec<&'a [u8]>,
@@ -59,8 +59,8 @@ pub async fn handle_get(
     match database.get(key) {
         Ok(Some(Value::Text(val))) => write_str(writer, &val).await,
         Ok(Some(_)) => write_response(writer, b"(value)\n").await, // fallback for other types
-        Ok(None)    => write_response(writer, b"(nil)\n").await,
-        Err(_)      => write_response(writer, b"Error: GET failed\n").await,
+        Ok(None) => write_response(writer, b"(nil)\n").await,
+        Err(_) => write_response(writer, b"Error: GET failed\n").await,
     }
 }
 
@@ -86,6 +86,15 @@ pub async fn handle_drop(
 ) -> std::io::Result<()> {
     database.drop_all();
     write_response(writer, b"OK\n").await
+}
+
+pub async fn handle_dbsize(
+    writer: &mut BufWriter<OwnedWriteHalf>,
+    database: &Database,
+) -> std::io::Result<()> {
+    let size = database.dbsize();
+    let response = format!("{size}\n");
+    write_response(writer, response.as_bytes()).await
 }
 
 //

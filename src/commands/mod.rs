@@ -29,7 +29,9 @@ enum Command {
     Get,
     Del,
     Drop,
+    Size,
     Unknown,
+
 }
 
 fn dispatch_command(cmd: &[u8]) -> Command {
@@ -40,6 +42,7 @@ fn dispatch_command(cmd: &[u8]) -> Command {
         "hello" => Command::Hello,
         "exit" => Command::Exit,
         "quit" => Command::Exit,
+        "dbsize" => Command::Size,
 
         // core commands
         "set" => Command::Set,
@@ -126,6 +129,7 @@ pub async fn handle_command(
         Command::Get => cmds::handle_get(&parts, writer, database).await?,
         Command::Del => cmds::handle_del(&parts, writer, database).await?,
         Command::Drop => cmds::handle_drop(writer, database).await?,
+        Command::Size => cmds::handle_dbsize(writer, database).await?,
         Command::Unknown => cmds::write_response(writer, b"Unknown command\n").await?,
     }
     Ok(false)

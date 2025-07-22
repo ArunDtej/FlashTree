@@ -2,7 +2,47 @@ use dashmap::DashMap;
 use std::collections::HashSet;
 use std::sync::{Arc, RwLock};
 
-use crate::db::Database;
+
+// For estimating heap usage of Value if it's a String or similar.
+// Update this for your own value types if needed!
+pub fn value_size(val: &Value) -> usize {
+    // If Value is a String:
+    // val.capacity()
+    // If Value has fields, sum them; if it's Copy, just size_of::<Value>()
+    std::mem::size_of_val(val)
+}
+
+// Recursively count the total heap size of the tree, starting from a node
+pub fn node_size_bytes(node: &Arc<RwLock<Node>>) -> usize {
+    let guard = node.read().unwrap();
+    let mut size = std::mem::size_of::<Node>();
+    size += std::mem::size_of::<Arc<RwLock<Node>>>(); // pointer, atomic, etc.
+
+    // Value
+    if let Some(ref value) = guard.value {
+        size += value_size(value);
+    }
+    // Estimate RwLock's own heap (usually a few words)
+    size += std::mem::size_of_val(&*node);
+
+    // Children
+    if let Some(ref children) = guard.children {
+        // Add the DashMap struct (shards pointers etc)
+        size += std::mem::size_of_val(children);
+        // Optionally, estimate more (e.g., 16K or 32K per default DashMap!)
+        // Traverse all entries
+        for entry in children.iter() {
+            let k = entry.key();
+            size += std::mem::size_of_val(k) + k.capacity(); // String struct + heap
+            let v = entry.value();
+            size += node_size_bytes(v);
+        }
+        // Highly approximate: add rough per-shard/bucket overhead, e.g.:
+        // size += children.len() / 32 * 1024; // 1KB per 32 entries (example)
+    }
+    size
+}
+
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -44,7 +84,6 @@ pub fn set(root: &Arc<RwLock<Node>>, key: &str, value: Value) -> Result<(), Stri
     if path.is_empty() {
         let mut guard = root.write().map_err(|_| "Lock poisoned")?;
         guard.value = Some(value);
-        println!("returning at root");
         return Ok(());
     }
 
@@ -116,6 +155,5 @@ pub fn get(root: &Arc<RwLock<Node>>, key: &str) -> Result<Option<Value>, String>
     }
 
     let guard = current.read().map_err(|_| "Lock poisoned")?;
-    println!("printing value{:?}", guard.value);
     Ok(guard.value.clone())
 }

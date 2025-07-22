@@ -35,11 +35,18 @@ impl Database {
         core::delete(&self.root, key)
     }
 
+    
+
     pub fn drop_all(&self) {
         let mut root = self.root.write().unwrap();
         root.value = None;
         root.ttl = None;
         root.children = None;
     }
-    
+
+    pub fn dbsize(&self)-> usize{
+        core::node_size_bytes(&self.root)
+
+    }
+
 }
