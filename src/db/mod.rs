@@ -1,16 +1,9 @@
-
 use std::sync::{Arc, RwLock};
 use dashmap::DashMap;
 use serde_json::Error;
 
 #[derive(Debug, Clone)]
 pub enum Value {
-    Int(i64),
-    UInt8(u8),
-    UInt16(u16), 
-    UInt32(u32),
-    UInt64(u64),
-    Float(f64),
     Text(String),
     Bool(bool),
 }
@@ -48,12 +41,13 @@ impl Database {
         &self.root
     }
 
+    // Core API (implement real logic here)
     pub fn set(&self, key: &str, value: Value) -> Result<(), String> {
         Ok(())
     }
 
     pub fn get(&self, key: &str) -> Result<Option<Value>, String> {
-        Ok((None))
+        Ok(None)
     }
 
     pub fn delete(&self, key: &str) -> Result<bool, String> {
@@ -65,6 +59,21 @@ impl Database {
         root.value = None;
         root.ttl = None;
         root.children = None;
-        // Ok(true)
+    }
+
+    // ────── String-only adapters for command interface ──────
+
+    /// "String-only" setter for use by commands module
+    pub fn set_str(&self, key: &str, value: String) -> Result<(), String> {
+        self.set(key, Value::Text(value))
+    }
+
+    /// "String-only" getter for use by commands module
+    pub fn get_str(&self, key: &str) -> Result<Option<String>, String> {
+        match self.get(key)? {
+            Some(Value::Text(s)) => Ok(Some(s)),
+            Some(Value::Bool(b)) => Ok(Some(b.to_string())),
+            None                => Ok(None),
+        }
     }
 }

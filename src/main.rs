@@ -1,5 +1,5 @@
 mod db;
-mod commands;  // ← This declaration is missing or incorrect
+mod commands;
 mod server;
 
 #[tokio::main]
