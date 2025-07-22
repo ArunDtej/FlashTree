@@ -1,11 +1,14 @@
 use std::sync::{Arc, RwLock};
 use dashmap::DashMap;
-use serde_json::Error;
+// use serde_json::Error;
+use std::collections::HashSet;
+
 
 #[derive(Debug, Clone)]
 pub enum Value {
     Text(String),
-    Bool(bool),
+    List(Vec<String>),
+    Set(HashSet<String>),
 }
 
 #[derive(Debug)]
@@ -59,21 +62,5 @@ impl Database {
         root.value = None;
         root.ttl = None;
         root.children = None;
-    }
-
-    // ────── String-only adapters for command interface ──────
-
-    /// "String-only" setter for use by commands module
-    pub fn set_str(&self, key: &str, value: String) -> Result<(), String> {
-        self.set(key, Value::Text(value))
-    }
-
-    /// "String-only" getter for use by commands module
-    pub fn get_str(&self, key: &str) -> Result<Option<String>, String> {
-        match self.get(key)? {
-            Some(Value::Text(s)) => Ok(Some(s)),
-            Some(Value::Bool(b)) => Ok(Some(b.to_string())),
-            None                => Ok(None),
-        }
     }
 }

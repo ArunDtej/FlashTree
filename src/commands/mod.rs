@@ -68,11 +68,19 @@ fn dispatch_command(cmd: &[u8]) -> Command {
 
         // set based operations
         "sadd" => Command::Unknown, // sadd path wdwjndw
-        "sremove" => Command::Unknown,
+        "srem" => Command::Unknown,
         "smove" => Command::Unknown,     // smove path newnjk path2
         "sismember" => Command::Unknown, // presence of an item in a set
         "scount" => Command::Unknown,
         "smembers" => Command::Unknown, // returns all set items
+        "spop" => Command::Unknown,
+        "srandmember" => Command::Unknown,
+        "sunion" => Command::Unknown,
+        "sinter" => Command::Unknown,
+        "sdiff" => Command::Unknown,
+        "sunionstore" => Command::Unknown,
+        "sinterstore" => Command::Unknown,
+        "sdiffstore" => Command::Unknown,
 
         // Unknown
         _ => Command::Unknown,

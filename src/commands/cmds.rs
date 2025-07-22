@@ -1,6 +1,7 @@
-use crate::db::Database;
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::tcp::OwnedWriteHalf;
+use crate::db::{Database, Value};
+
 
 pub struct CommandParts<'a> {
     parts: Vec<&'a [u8]>,
@@ -39,12 +40,13 @@ pub async fn handle_set(
         return write_response(writer, b"Usage: SET key value\n").await;
     }
     let key = bytes_to_str(parts.get(1).unwrap());
-    let value = bytes_to_str(parts.get(2).unwrap()).to_string();
-    match database.set_str(key, value) {
+    let value = Value::Text(bytes_to_str(parts.get(2).unwrap()).to_string());
+    match database.set(key, value) {
         Ok(_) => write_response(writer, b"OK\n").await,
         Err(_) => write_response(writer, b"Error: SET failed\n").await,
     }
 }
+
 
 pub async fn handle_get(
     parts: &CommandParts<'_>,
@@ -55,12 +57,15 @@ pub async fn handle_get(
         return write_response(writer, b"Usage: GET key\n").await;
     }
     let key = bytes_to_str(parts.get(1).unwrap());
-    match database.get_str(key) {
-        Ok(Some(val)) => write_str(writer, &val).await,
-        Ok(None) => write_response(writer, b"(nil)\n").await,
-        Err(_) => write_response(writer, b"Error: GET failed\n").await,
+    match database.get(key) {
+        Ok(Some(Value::Text(val))) => write_str(writer, &val).await,
+        Ok(Some(_)) => write_response(writer, b"(value)\n").await, // fallback for other types
+        Ok(None)    => write_response(writer, b"(nil)\n").await,
+        Err(_)      => write_response(writer, b"Error: GET failed\n").await,
     }
 }
+
+
 
 pub async fn handle_del(
     parts: &CommandParts<'_>,
