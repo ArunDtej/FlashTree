@@ -2,10 +2,10 @@ use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::tcp::OwnedWriteHalf;
 use crate::db::{Database, Value};
 
-
 pub struct CommandParts<'a> {
     parts: Vec<&'a [u8]>,
 }
+
 impl<'a> CommandParts<'a> {
     pub fn new(buf: &'a [u8]) -> Self {
         let mut parts = Vec::new();
@@ -47,7 +47,6 @@ pub async fn handle_set(
     }
 }
 
-
 pub async fn handle_get(
     parts: &CommandParts<'_>,
     writer: &mut BufWriter<OwnedWriteHalf>,
@@ -64,8 +63,6 @@ pub async fn handle_get(
         Err(_)      => write_response(writer, b"Error: GET failed\n").await,
     }
 }
-
-
 
 pub async fn handle_del(
     parts: &CommandParts<'_>,
@@ -100,6 +97,7 @@ pub fn bytes_to_str(bytes: &[u8]) -> &str {
     std::str::from_utf8(bytes).unwrap_or("")
 }
 
+#[inline(always)]
 pub async fn write_response(
     writer: &mut BufWriter<OwnedWriteHalf>,
     data: &[u8],
@@ -108,6 +106,7 @@ pub async fn write_response(
     writer.flush().await
 }
 
+#[inline]
 pub async fn write_str(writer: &mut BufWriter<OwnedWriteHalf>, value: &str) -> std::io::Result<()> {
     write_response(writer, format!("{value}\n").as_bytes()).await
 }
