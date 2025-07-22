@@ -88,14 +88,41 @@ pub async fn handle_drop(
     write_response(writer, b"OK\n").await
 }
 
-pub async fn handle_dbsize(
+pub async fn handle_memory(
     writer: &mut BufWriter<OwnedWriteHalf>,
     database: &Database,
 ) -> std::io::Result<()> {
-    let size = database.dbsize();
-    let response = format!("{size}\n");
+    let size = database.memory();
+    let size_kb = size as f64 / 1024.0;
+    let size_mb = size as f64 / (1024.0 * 1024.0);
+
+    let response = format!(
+        "Keys: {size}\nApprox. Size: {:.2} KB | {:.4} MB\n",
+        size_kb, size_mb
+    );
+
     write_response(writer, response.as_bytes()).await
 }
+
+
+pub async fn handle_size(
+    writer: &mut BufWriter<OwnedWriteHalf>,
+    database: &Database,
+) -> std::io::Result<()> {
+    let count = database.size();
+    let size = database.memory();
+    let size_kb = size as f64 / 1024.0;
+    let size_mb = size as f64 / (1024.0 * 1024.0);
+
+    let response = format!(
+        "Keys: {count}\nApprox. Size: {:.2} KB | {:.4} MB\n",
+        size_kb, size_mb
+    );
+
+
+    write_response(writer, response.as_bytes()).await
+}
+
 
 //
 // ─── Misc Helpers ──────────────────────────────────────────────────────────────

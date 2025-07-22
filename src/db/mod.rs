@@ -39,14 +39,17 @@ impl Database {
 
     pub fn drop_all(&self) {
         let mut root = self.root.write().unwrap();
-        root.value = None;
-        root.ttl = None;
-        root.children = None;
+        root.v = None;
+        root.t = None;
+        root.c = None;
     }
 
-    pub fn dbsize(&self)-> usize{
+    pub fn memory(&self)-> usize{
         core::node_size_bytes(&self.root)
+    }
 
+    pub fn size(&self)->usize {
+        core::node_count(&self.root)
     }
 
 }
