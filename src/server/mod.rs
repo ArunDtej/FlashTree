@@ -6,14 +6,11 @@ use tokio::sync::Semaphore;
 use tokio::time::{timeout, Duration};
 use crate::db::Database;
 
-pub async fn start(addr: &str) -> std::io::Result<()> {
+pub async fn start(addr: &str, database: Database) -> std::io::Result<()> {
     let listener = TcpListener::bind(addr).await?;
     let max_connections = 5000;
     let semaphore = Arc::new(Semaphore::new(max_connections));
     let active_connections = Arc::new(AtomicUsize::new(0));
-    
-    // Initialize the database with root node
-    let database = Database::new();
     
     println!("FlashTree server started on {}", addr);
 
