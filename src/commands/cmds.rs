@@ -92,33 +92,35 @@ pub async fn handle_memory(
     writer: &mut BufWriter<OwnedWriteHalf>,
     database: &Database,
 ) -> std::io::Result<()> {
-    let size = database.memory();
-    let size_kb = size as f64 / 1024.0;
-    let size_mb = size as f64 / (1024.0 * 1024.0);
+    let stats = database.memory();
+    let total_kb = stats.total_bytes as f64 / 1024.0;
+    let total_mb = stats.total_bytes as f64 / (1024.0 * 1024.0);
+    let smallest_kb = stats.smallest_node as f64 / 1024.0;
+    let largest_kb = stats.largest_node as f64 / 1024.0;
 
     let response = format!(
-        "Keys: {size}\nApprox. Size: {:.2} KB | {:.4} MB\n",
-        size_kb, size_mb
+        "Nodes: {}\n\
+Total Approx Size: {} bytes | {:.2} KB | {:.4} MB\n\
+Smallest Node: {} bytes | {:.3} KB\n\
+Largest Node: {} bytes | {:.3} KB\n",
+        stats.node_count,
+        stats.total_bytes, total_kb, total_mb,
+        stats.smallest_node, smallest_kb,
+        stats.largest_node, largest_kb,
     );
 
     write_response(writer, response.as_bytes()).await
 }
 
 
+
 pub async fn handle_size(
     writer: &mut BufWriter<OwnedWriteHalf>,
     database: &Database,
 ) -> std::io::Result<()> {
-    let count = database.size();
-    let size = database.memory();
-    let size_kb = size as f64 / 1024.0;
-    let size_mb = size as f64 / (1024.0 * 1024.0);
+    let count = database.size();    
 
-    let response = format!(
-        "Keys: {count}\nApprox. Size: {:.2} KB | {:.4} MB\n",
-        size_kb, size_mb
-    );
-
+    let response = format!("Keys: {count}\n");
 
     write_response(writer, response.as_bytes()).await
 }
