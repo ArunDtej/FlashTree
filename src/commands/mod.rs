@@ -5,7 +5,6 @@ mod cmds;
 
 //
 // ─── Utility Functions ───────────────────────────────────────────────────────────
-//
 
 #[inline]
 fn normalize_command(input: &[u8]) -> &[u8] {
